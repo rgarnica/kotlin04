@@ -5,6 +5,9 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.StaggeredGridLayoutManager
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.ListAdapter
@@ -20,30 +23,19 @@ class MainActivity : AppCompatActivity() {
         Person("João", 20, "Rua marta joana", Group.RED)
     )
 
-    var listAdapter : PersonListAdapter? = null
+    var viewAdapter : PersonListAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        listAdapter = PersonListAdapter(this, people)
+
+        viewAdapter = PersonListAdapter(this, people)
+        val viewManager : RecyclerView.LayoutManager = LinearLayoutManager(this)
+
 
         list_people.apply {
-            this.adapter = listAdapter
-            setOnItemLongClickListener { parent, view, position, id ->
-                AlertDialog.Builder(this.context)
-                    .setTitle("Remover Pessoa")
-                    .setMessage("Gostaria mesmo de remover essa pessoa da lista?")
-                    .setPositiveButton("Sim") { _, _ ->
-                        people.removeAt(position)
-                        listAdapter!!.notifyDataSetChanged()
-                    }
-                    .setNegativeButton("Não") { dialog, _ ->
-                        dialog.cancel()
-                    }
-                    .create()
-                    .show()
-                true
-            }
+            adapter = viewAdapter
+            layoutManager = viewManager
         }
 
 
@@ -68,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         if (requestCode == REQUEST_NEW_PERSON && resultCode == Activity.RESULT_OK) {
             val person = data!!.getParcelableExtra<Person>("newPerson")
             people.add(person)
-            listAdapter!!.notifyDataSetChanged()
+            viewAdapter!!.notifyDataSetChanged()
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
